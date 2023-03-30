@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemParent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/margin_5"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/margin_10">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10">
+
+        <TextView
+            android:id="@+id/schoolName"
+            style="@style/ListHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+
+            style="@style/ListAddress"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/schoolName" />
+
+        <TextView
+            android:id="@+id/totalStudent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            style="@style/ListDesc"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/website"
+            android:layout_marginTop="@dimen/margin_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_dialog_info"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/totalStudent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_16"
+            android:src="@android:drawable/ic_menu_call"
+            android:tint="@color/colorPrimary"
+            android:layout_marginTop="@dimen/margin_5"
+            app:layout_constraintLeft_toRightOf="@id/website"
+            app:layout_constraintTop_toBottomOf="@id/totalStudent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/mail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_16"
+            android:src="@android:drawable/ic_dialog_email"
+            android:tint="@color/colorPrimary"
+            android:layout_marginTop="@dimen/margin_5"
+            app:layout_constraintLeft_toRightOf="@id/call"
+            app:layout_constraintTop_toBottomOf="@id/totalStudent" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_16"
+            android:src="@android:drawable/ic_dialog_map"
+            android:tint="@color/colorPrimary"
+            android:layout_marginTop="@dimen/margin_5"
+            app:layout_constraintLeft_toRightOf="@id/mail"
+            app:layout_constraintTop_toBottomOf="@id/totalStudent" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_16"
+            android:rotation="90"
+            android:src="@android:drawable/arrow_up_float"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

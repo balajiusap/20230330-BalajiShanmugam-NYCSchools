@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@+id/navigationHome">
+
+    <fragment
+        android:id="@+id/navigationHome"
+        android:name="com.dev.nycschools.screens.school.SchoolActivityFragment">
+        <action
+            android:id="@+id/action_nav_home_to_nav_school_details"
+            app:destination="@id/nav_school_details" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_school_details"
+        android:name="com.dev.nycschools.screens.schoolDetails.SchoolDetailsFragment">
+        <argument
+            android:name="selectedSchool"
+            app:argType="com.dev.nycschools.models.school.School" />
+          </fragment>
+
+</navigation>

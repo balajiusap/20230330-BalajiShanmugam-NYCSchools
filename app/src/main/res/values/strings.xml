@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">NYC Schools</string>
+    <string name="error_in_retrieving_data">Error in retrieving data</string>
+    <string name="address">%1d %2d </string>
+    <string name="sat_test_taken">Number of SAT test takers : </string>
+    <string name="reading_avg">SAT critical reading avg score : </string>
+    <string name="math_avg">SAT math avg score : </string>
+    <string name="writing_avg">SAT writing avg score : </string>
+    <string name="not_available">Sorry! SAT score not available</string>
+    <string name="desc">OverView : \n\n</string>
+</resources>
