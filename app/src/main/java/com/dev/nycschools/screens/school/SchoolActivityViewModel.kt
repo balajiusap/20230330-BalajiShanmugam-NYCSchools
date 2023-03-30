@@ -27,11 +27,12 @@ class SchoolActivityViewModel(
     private val job = SupervisorJob()
     private val mUiScope = CoroutineScope(mainDispatcher + job)
     private val mIoScope = CoroutineScope(ioDispatcher + job)
-    private var mLimit = 10
+    private var mLimit = 50
     private var mOffset = 0
     var newDataCount = 0
     var isLoadMoreData = false
-    private var list: ArrayList<School> = ArrayList<School>()
+    var fetchedAllData = false
+    private var list: ArrayList<School> = ArrayList()
     var recyclerViewState: Parcelable? = null
 
     init {
@@ -40,8 +41,9 @@ class SchoolActivityViewModel(
     }
 
     //Reset any member as per flow
-    private fun resetValues() {
-
+    fun resetValues() {
+        isLoadMoreData = false
+        newDataCount = 0
     }
 
     //can be called from View explicitly if required
@@ -49,7 +51,6 @@ class SchoolActivityViewModel(
     fun requestLoginActivityData() {
         if (mSchoolResponse.value == null) {
             mUiScope.launch {
-                mSchoolResponse.value = LiveDataWrapper.loading()
                 setLoadingVisibility(true)
                 try {
                     list = mIoScope.async {
@@ -73,6 +74,7 @@ class SchoolActivityViewModel(
     fun requestLoadMoreData() {
         mUiScope.launch {
             mOffset += mLimit
+            mSchoolResponse.value = LiveDataWrapper.loading()
             try {
                 val data = mIoScope.async {
                     return@async useCase.processSchoolsUseCase(mLimit, mOffset)
@@ -83,6 +85,9 @@ class SchoolActivityViewModel(
                         newDataCount = it.size
                         list.addAll(it)
                         mSchoolResponse.value = LiveDataWrapper.success(list)
+                        if (newDataCount < mLimit || newDataCount == 0) {
+                            fetchedAllData = true
+                        }
                     }
                 } catch (_: Exception) {
                 }
@@ -117,11 +122,6 @@ class SchoolActivityViewModel(
 
     private fun setLoadingVisibility(visible: Boolean) {
         mLoadingLiveData.postValue(visible)
-    }
-
-    fun resetLoadMoreData() {
-        isLoadMoreData = false
-        newDataCount = 0
     }
 
     override fun onCleared() {

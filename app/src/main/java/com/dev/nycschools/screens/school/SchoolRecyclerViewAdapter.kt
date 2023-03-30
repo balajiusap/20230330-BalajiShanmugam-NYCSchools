@@ -63,9 +63,8 @@ class SchoolRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateMoreListItems(updatedList: ArrayList<School?>, newDataCount: Int) {
+    fun updateMoreListItems(newDataCount: Int) {
         val totalCount = mItemList.size
-        mItemList.addAll(updatedList.subList(totalCount - newDataCount, totalCount))
         notifyItemRangeInserted(totalCount - newDataCount, newDataCount)
     }
 

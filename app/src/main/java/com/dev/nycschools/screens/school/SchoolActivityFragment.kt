@@ -72,7 +72,7 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
         //Start observing the targets
         this.mViewModel.mSchoolResponse.observe(viewLifecycleOwner, this.mDataObserver)
         this.mViewModel.mLoadingLiveData.observe(viewLifecycleOwner, this.loadingObserver)
-        this.mViewModel.resetLoadMoreData()
+        this.mViewModel.resetValues()
         mRecyclerViewAdapter = SchoolRecyclerViewAdapter(requireActivity(), arrayListOf(), this)
         binding.landingListRecyclerView.adapter = mRecyclerViewAdapter
         binding.landingListRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
@@ -89,9 +89,8 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
                     "Scrolling lastVisibleItemPosition: $lastVisibleItemPosition - totalItemCount = $totalItemCount"
                 )
                 if (lastVisibleItemPosition == totalItemCount) {
-                    if (!isLoading) {
+                    if (!isLoading && !mViewModel.fetchedAllData) {
                         isLoading = true
-                        mRecyclerViewAdapter.startLoadMoreProgress()
                         mViewModel.requestLoadMoreData()
                     }
                 }
@@ -107,6 +106,7 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
         when (result?.responseStatus) {
             LiveDataWrapper.RESPONSESTATUS.LOADING -> {
                 // Loading data
+                mRecyclerViewAdapter.startLoadMoreProgress()
             }
             LiveDataWrapper.RESPONSESTATUS.ERROR -> {
                 // Error for http request
@@ -122,7 +122,7 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
                 if (!mViewModel.isLoadMoreData) {
                     processData(listItems)
                 } else {
-                    processLoadMoreData(listItems, mViewModel.newDataCount)
+                    processLoadMoreData(mViewModel.newDataCount)
                 }
 
             }
@@ -158,12 +158,12 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
     /**
      * Handle success data
      */
-    private fun processLoadMoreData(listItems: ArrayList<School?>, newDataCount: Int) {
+    private fun processLoadMoreData(newDataCount: Int) {
         if (isLoading) {
             val refresh = Handler(Looper.getMainLooper())
             refresh.post {
                 mRecyclerViewAdapter.stopLoadMoreProgress(newDataCount)
-                mRecyclerViewAdapter.updateMoreListItems(listItems, newDataCount)
+                mRecyclerViewAdapter.updateMoreListItems(newDataCount)
                 isLoading = false
             }
 
