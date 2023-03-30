@@ -28,3 +28,9 @@
 - Portrait and landscape orientation handled
 - Mocked dependency and created required test cases 
 - Able to Execute both Unit and Instrumentation test cases
+
+## ScreenShots
+
+<img src="screenshots/SchoolListScreen.png" title="NYC School List Screen" width="320">
+
+<img src="screenshots/SchoolDetailsWithSATInfo.png"  title="NYC School Detail Page" width="320">
