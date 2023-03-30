@@ -1,5 +1,6 @@
 package com.dev.nycschools.screens.school
 
+import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dev.nycschools.models.school.School
@@ -26,8 +27,12 @@ class SchoolActivityViewModel(
     private val job = SupervisorJob()
     private val mUiScope = CoroutineScope(mainDispatcher + job)
     private val mIoScope = CoroutineScope(ioDispatcher + job)
-    private var mLimit = 50
+    private var mLimit = 10
     private var mOffset = 0
+    var newDataCount = 0
+    var isLoadMoreData = false
+    private var list: ArrayList<School> = ArrayList<School>()
+    var recyclerViewState: Parcelable? = null
 
     init {
         //call reset to reset all VM data as required
@@ -47,11 +52,11 @@ class SchoolActivityViewModel(
                 mSchoolResponse.value = LiveDataWrapper.loading()
                 setLoadingVisibility(true)
                 try {
-                    val data = mIoScope.async {
+                    list = mIoScope.async {
                         return@async useCase.processSchoolsUseCase(mLimit, mOffset)
                     }.await()
                     try {
-                        mSchoolResponse.value = LiveDataWrapper.success(data)
+                        mSchoolResponse.value = LiveDataWrapper.success(list)
                     } catch (_: Exception) {
                     }
                     setLoadingVisibility(false)
@@ -73,7 +78,12 @@ class SchoolActivityViewModel(
                     return@async useCase.processSchoolsUseCase(mLimit, mOffset)
                 }.await()
                 try {
-                    mSchoolResponse.value = LiveDataWrapper.loadMore(data)
+                    LiveDataWrapper.success(data).response?.let {
+                        isLoadMoreData = true
+                        newDataCount = it.size
+                        list.addAll(it)
+                        mSchoolResponse.value = LiveDataWrapper.success(list)
+                    }
                 } catch (_: Exception) {
                 }
             } catch (_: Exception) {
@@ -107,6 +117,11 @@ class SchoolActivityViewModel(
 
     private fun setLoadingVisibility(visible: Boolean) {
         mLoadingLiveData.postValue(visible)
+    }
+
+    fun resetLoadMoreData() {
+        isLoadMoreData = false
+        newDataCount = 0
     }
 
     override fun onCleared() {

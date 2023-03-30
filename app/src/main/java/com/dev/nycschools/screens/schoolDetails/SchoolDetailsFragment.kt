@@ -106,8 +106,8 @@ class SchoolDetailsFragment : BaseFragment() {
      */
     @SuppressLint("SetTextI18n")
     private fun processData(listItems: ArrayList<SchoolSatScore>) {
-        logD(tag, "processData called with data ${listItems.size}")
-        logD(tag, "processData listItems =  $listItems")
+        logD(tag, "processData called with SchoolSatScore ${listItems.size}")
+        logD(tag, "processData SchoolSatScore =  $listItems")
 
         val refresh = Handler(Looper.getMainLooper())
         refresh.post {

@@ -4,7 +4,6 @@ package com.dev.nycschools.screens.school
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,27 +51,19 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
     // onDestroyView.
     private val binding get() = _binding
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onSaveInstanceState(outState: Bundle) {
+        mViewModel.recyclerViewState =
+            binding.landingListRecyclerView.layoutManager?.onSaveInstanceState()
+        super.onSaveInstanceState(outState)
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentMainActivityBinding.inflate(inflater, container, false)
         return binding.root
 
     }
-
-    private val argsScrollState = "recyclerState"
-    private var recyclerViewState: Parcelable? = null
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putParcelable(
-            argsScrollState,
-            binding.landingListRecyclerView.layoutManager?.onSaveInstanceState()
-        )
-        super.onSaveInstanceState(outState)
-    }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,12 +72,10 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
         //Start observing the targets
         this.mViewModel.mSchoolResponse.observe(viewLifecycleOwner, this.mDataObserver)
         this.mViewModel.mLoadingLiveData.observe(viewLifecycleOwner, this.loadingObserver)
-
+        this.mViewModel.resetLoadMoreData()
         mRecyclerViewAdapter = SchoolRecyclerViewAdapter(requireActivity(), arrayListOf(), this)
         binding.landingListRecyclerView.adapter = mRecyclerViewAdapter
         binding.landingListRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
-
-        recyclerViewState = savedInstanceState?.getParcelable(argsScrollState)
 
         binding.landingListRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -99,7 +88,6 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
                     mTag,
                     "Scrolling lastVisibleItemPosition: $lastVisibleItemPosition - totalItemCount = $totalItemCount"
                 )
-
                 if (lastVisibleItemPosition == totalItemCount) {
                     if (!isLoading) {
                         isLoading = true
@@ -131,13 +119,12 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
                 // Data from API
                 logD(mTag, "LiveDataResult.Status.SUCCESS = ${result.response}")
                 val listItems = result.response as ArrayList<School?>
-                processData(listItems)
-            }
-            LiveDataWrapper.RESPONSESTATUS.LOADMORE -> {
-                // Data from API
-                logD(mTag, "LiveDataResult.Status.LOAD_MORE = ${result.response}")
-                val listItems = result.response as ArrayList<School>
-                processLoadMoreData(listItems)
+                if (!mViewModel.isLoadMoreData) {
+                    processData(listItems)
+                } else {
+                    processLoadMoreData(listItems, mViewModel.newDataCount)
+                }
+
             }
             else -> {}
         }
@@ -158,24 +145,25 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
             mRecyclerViewAdapter.updateListItems(
                 listItems
             )
+            // Handling Recycler View Retain Scroll state
+            mViewModel.recyclerViewState?.let {
+                binding.landingListRecyclerView.layoutManager?.onRestoreInstanceState(it)
+                mViewModel.recyclerViewState = null // to prevent state restoration on list updates
+            }
         }
-        // Handling Recycler View Retain Scroll state
-        recyclerViewState?.let {
-            binding.landingListRecyclerView.layoutManager?.onRestoreInstanceState(it)
-            recyclerViewState = null // to prevent state restoration on list updates
-        }
+
 
     }
 
     /**
      * Handle success data
      */
-    private fun processLoadMoreData(listItems: ArrayList<School>) {
+    private fun processLoadMoreData(listItems: ArrayList<School?>, newDataCount: Int) {
         if (isLoading) {
             val refresh = Handler(Looper.getMainLooper())
             refresh.post {
-                mRecyclerViewAdapter.stopLoadMoreProgress()
-                mRecyclerViewAdapter.updateMoreListItems(listItems)
+                mRecyclerViewAdapter.stopLoadMoreProgress(newDataCount)
+                mRecyclerViewAdapter.updateMoreListItems(listItems, newDataCount)
                 isLoading = false
             }
 
@@ -204,6 +192,9 @@ class SchoolActivityFragment : BaseFragment(), ItemClickListener {
         )
         Navigation.findNavController(view)
             .navigate(R.id.action_nav_home_to_nav_school_details, bundle)
+
+        mViewModel.recyclerViewState =
+            binding.landingListRecyclerView.layoutManager?.onSaveInstanceState()
     }
 
 

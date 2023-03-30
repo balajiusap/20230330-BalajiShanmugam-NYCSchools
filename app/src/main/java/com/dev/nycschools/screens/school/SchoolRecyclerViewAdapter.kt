@@ -63,10 +63,10 @@ class SchoolRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateMoreListItems(updatedList: ArrayList<School>) {
-        val positionStart = mItemList.size
-        mItemList.addAll(updatedList)
-        notifyItemRangeInserted(positionStart, updatedList.size)
+    fun updateMoreListItems(updatedList: ArrayList<School?>, newDataCount: Int) {
+        val totalCount = mItemList.size
+        mItemList.addAll(updatedList.subList(totalCount - newDataCount, totalCount))
+        notifyItemRangeInserted(totalCount - newDataCount, newDataCount)
     }
 
     override fun getItemCount(): Int {
@@ -164,8 +164,8 @@ class SchoolRecyclerViewAdapter(
         notifyItemInserted(mItemList.size - 1)
     }
 
-    fun stopLoadMoreProgress() {
-        mItemList.removeAt(mItemList.size - 1)
+    fun stopLoadMoreProgress(newDataCount: Int) {
+        mItemList.removeAt(mItemList.size - newDataCount - 1)
         val scrollPosition: Int = mItemList.size
         notifyItemRemoved(scrollPosition + 1)
     }
